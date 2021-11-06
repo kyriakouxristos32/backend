@@ -5,18 +5,18 @@ import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
 
 const signup = (req, res, next) => {
-    // checks if email already exists
+    // Έλεγχος ότι το email είναι μονάδικο
     User.findOne({ where : {
         email: req.body.email, 
     }})
     .then(dbUser => {
         if (dbUser) {
-            return res.status(409).json({message: "email already exists"});
+            return res.status(409).json({message: "Το email υπάρχει ήδη"});
         } else if (req.body.email && req.body.password) {
             // password hash
             bcrypt.hash(req.body.password, 12, (err, passwordHash) => {
                 if (err) {
-                    return res.status(500).json({message: "couldnt hash the password"}); 
+                    return res.status(500).json({message: "Σφάλμα με το κωδικό hash the password"});
                 } else if (passwordHash) {
                     return User.create(({
                         email: req.body.email,
@@ -24,18 +24,18 @@ const signup = (req, res, next) => {
                         password: passwordHash,
                     }))
                     .then(() => {
-                        res.status(200).json({message: "user created"});
+                        res.status(200).json({message: "Ο λογαριασμός δημιουργηθήκε"});
                     })
                     .catch(err => {
                         console.log(err);
-                        res.status(502).json({message: "error while creating the user"});
+                        res.status(502).json({message: "Σφάλμα κατά την διαρκειά δημιυργίας νέου χρήστης"});
                     });
                 };
             });
         } else if (!req.body.password) {
-            return res.status(400).json({message: "password not provided"});
+            return res.status(400).json({message: "Συμπλήρωστε το πεδίο του κωδικού"});
         } else if (!req.body.email) {
-            return res.status(400).json({message: "email not provided"});
+            return res.status(400).json({message: "Συμπληρώστε το email"});
         };
     })
     .catch(err => {
